@@ -15,11 +15,81 @@ $(document).ready(function(){
 
     getUserData();
 
+    function displayProfile(name, status, logo, link)
+    {
+        console.log(status);
+        var mainContainer = document.getElementById('mainContainer');
+
+        var content = document.createElement('div');
+        content.classList.add("input-group", "content", "container");
+        content.setAttribute("id","content")
+
+        var userPicDiv = document.createElement('div');
+        userPicDiv.classList.add('userPic');
+
+        var users = document.createElement('div');
+        users.classList.add("users");
+
+        var image = document.createElement('img');
+        image.classList.add("img-circle", "profilePictue");
+        image.setAttribute("alt","Twitch Logo");
+
+        if(!logo)
+        {
+          image.setAttribute('src', "https://s3-us-west-2.amazonaws.com/web-design-ext-production/p/Twitch_474x356.png");
+        }
+
+        else
+        {
+           image.setAttribute('src', logo);
+        }
+
+        var twitchUser = document.createElement('a');
+        twitchUser.setAttribute("href", link);
+        twitchUser.innerHTML = name;
+
+
+        userPicDiv.appendChild(image);
+        content.appendChild(userPicDiv);
+
+        users.appendChild(twitchUser);
+        content.appendChild(users);
+
+        mainContainer.appendChild(content);
+
+        var stream = document.createElement('div');
+        stream.classList.add('stream');
+
+        var twitchStream = document.createElement('a');
+        twitchStream.setAttribute("href", "#");
+
+        if(status === "Offline")
+        {
+            document.getElementById('content').style.backgroundColor = "red";
+        }
+
+        else
+        {
+            twitchStream.innerHTML = status;
+            document.getElementById('content').style.backgroundColor = "aqua";
+        }
+
+
+        stream.appendChild(twitchStream);
+        content.appendChild(stream);
+
+        mainContainer.appendChild(content);
+    }
+
 
    document.getElementById('all').addEventListener("click", function() {
 
        console.log(twitchUserData);
 
+
+      for (var i = 0; i < twitchUserData.length; i++) {
+         displayProfile(twitchUserData[i].name, twitchUserData[i].stream, twitchUserData[i].logo, twitchUserData[i].link);
+      }
    });
 
     //This is service worker. A javascript technology to help in network operations including caching. For our application, we don't want to fetch data every time from the API endpoint, as this slows the speed of the app.
@@ -36,14 +106,14 @@ $(document).ready(function(){
 //        })
 //    }
 //
-    function emptyAll()
-    {
-        var content = document.getElementById('div');
-        content.classList.remove("input-group", "content", "container")
+   //  function emptyAll()
+   //  {
+   //      var content = document.getElementById('div');
+   //      content.classList.remove("input-group", "content", "container")
+    //
+   //  }
 
-    }
-
-    function getUserData(){
+    function getUserData() {
         streamers.forEach(function(twitchUser) {
             getStreamData(twitchUser);
         })
@@ -68,7 +138,7 @@ $(document).ready(function(){
                 }
 
                 tempData.link = data._links.self;
-                twitchUserData.push(tempData);
+                //twitchUserData.push(tempData);
 
             //send out another fetch request to get profile data
             fetch(twitchChannel + user + clientId)
@@ -77,7 +147,7 @@ $(document).ready(function(){
                 return response.json();
 
                 }).then(function(profileData) {
-                    console.log(profileData);
+                    //console.log(profileData);
                     tempData.name = profileData.display_name;
                     tempData.logo = profileData.logo;
                     twitchUserData.push(tempData);
@@ -92,48 +162,6 @@ $(document).ready(function(){
         })
     }
 
-    function displayProfilePic(callBack)
-    {
-        var mainContainer = document.getElementById('mainContainer');
-
-
-        var content = document.createElement('div');
-        content.classList.add("input-group", "content", "container");
-        content.setAttribute("id","content")
-
-        var userPicDiv = document.createElement('div');
-        userPicDiv.classList.add('userPic');
-
-        var users = document.createElement('div');
-        users.classList.add("users");
-
-        var image = document.createElement('img');
-        image.classList.add("img-circle", "profilePictue");
-        image.setAttribute("alt","Twitch Logo");
-
-        if(!callBack.logo)
-        {
-          image.setAttribute('src', "https://s3-us-west-2.amazonaws.com/web-design-ext-production/p/Twitch_474x356.png");
-        }
-
-        else
-        {
-           image.setAttribute('src', callBack.logo);
-        }
-
-        var twitchUser = document.createElement('a');
-        twitchUser.setAttribute("href", callBack._links.self);
-        twitchUser.innerHTML = callBack.display_name;
-
-
-        userPicDiv.appendChild(image);
-        content.appendChild(userPicDiv);
-
-        users.appendChild(twitchUser);
-        content.appendChild(users);
-
-        mainContainer.appendChild(content);
-    }
 
 
 
