@@ -1,4 +1,4 @@
-var cacheName = 'v1';
+var cacheName = 'v3';
 var cacheFiles = [
     '/',
     'index.html',
@@ -8,7 +8,7 @@ var cacheFiles = [
     'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css',
     'https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js',
     'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js'
-]
+];
 
 self.addEventListener('install', function(e){
     console.log("Service worker installed");
