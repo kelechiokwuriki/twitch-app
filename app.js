@@ -177,26 +177,19 @@
       newContent.appendChild(content)
       mainContainer.appendChild(newContent);
    }
+   //This is service worker. A javascript technology to help in network operations including caching.
+   // For our application, we don't want to fetch data every time from the API endpoint, as this slows the speed of the app.
+   // 1. check for service worker availability and register it
+  if('serviceWorker' in navigator){
+
+      navigator.serviceWorker
+      .register('sw.js')
+      .then(function(registeration) {
+          console.log("Service worker registered", registeration);
+      })
+      .catch(function(err) {
+          console.log("Service worker failed to register", err);
+      })
+  }
 
 })();
-
-    //This is service worker. A javascript technology to help in network operations including caching. For our application, we don't want to fetch data every time from the API endpoint, as this slows the speed of the app.
-    //1. check for service worker availability and register it
-//    if('serviceWorker' in navigator){
-//
-//        navigator.serviceWorker
-//        .register('sw.js')
-//        .then(function(registeration) {
-//            console.log("Service worker registered", registeration);
-//        })
-//        .catch(function(err) {
-//            console.log("Service worker failed to register", err);
-//        })
-//    }
-//
-   //  function emptyAll()
-   //  {
-   //      var content = document.getElementById('div');
-   //      content.classList.remove("input-group", "content", "container")
-    //
-   //  }
