@@ -1,96 +1,184 @@
-$(document).ready(function(){
-    var streamers = ["ESL_SC2", "cretetion", "freecodecamp", "OgamingSC2"];
+(function(){
 
-    var twitchUserData = [];
+   const streamers = ["ESL_SC2", "cretetion", "freecodecamp", "OgamingSC2"];
+   var onlineStreamers = [];
+   var offlineStreamers = [];
 
-    var streamDataV = "";
+   var twitchUserData = [];
+   var onlineUserData;
 
-    var clientId = "?client_id=rwh926q8ctfv1ehglohd745jwasutw";
-
-    var twitchStream = "https://api.twitch.tv/kraken/streams/"
-
-    var twitchChannel = "https://api.twitch.tv/kraken/channels/";
-
-    var allClicked = false;
-
-    getUserData();
-
-    function displayProfile(name, status, logo, link)
-    {
-        console.log(status);
-        var mainContainer = document.getElementById('mainContainer');
-
-        var content = document.createElement('div');
-        content.classList.add("input-group", "content", "container");
-        content.setAttribute("id","content")
-
-        var userPicDiv = document.createElement('div');
-        userPicDiv.classList.add('userPic');
-
-        var users = document.createElement('div');
-        users.classList.add("users");
-
-        var image = document.createElement('img');
-        image.classList.add("img-circle", "profilePictue");
-        image.setAttribute("alt","Twitch Logo");
-
-        if(!logo)
-        {
-          image.setAttribute('src', "https://s3-us-west-2.amazonaws.com/web-design-ext-production/p/Twitch_474x356.png");
-        }
-
-        else
-        {
-           image.setAttribute('src', logo);
-        }
-
-        var twitchUser = document.createElement('a');
-        twitchUser.setAttribute("href", link);
-        twitchUser.innerHTML = name;
-
-
-        userPicDiv.appendChild(image);
-        content.appendChild(userPicDiv);
-
-        users.appendChild(twitchUser);
-        content.appendChild(users);
-
-        mainContainer.appendChild(content);
-
-        var stream = document.createElement('div');
-        stream.classList.add('stream');
-
-        var twitchStream = document.createElement('a');
-        twitchStream.setAttribute("href", "#");
-
-        if(status === "Offline")
-        {
-            document.getElementById('content').style.backgroundColor = "red";
-        }
-
-        else
-        {
-            twitchStream.innerHTML = status;
-            document.getElementById('content').style.backgroundColor = "aqua";
-        }
-
-
-        stream.appendChild(twitchStream);
-        content.appendChild(stream);
-
-        mainContainer.appendChild(content);
-    }
-
-
-   document.getElementById('all').addEventListener("click", function() {
-
-       console.log(twitchUserData);
-
+    document.getElementById('all').addEventListener("click", function() {
+      // console.log(twitchUserData);
+      //had to use jquery here man
+      //clear items before showing
+      $("#newContent").empty();
 
       for (var i = 0; i < twitchUserData.length; i++) {
-         displayProfile(twitchUserData[i].name, twitchUserData[i].stream, twitchUserData[i].logo, twitchUserData[i].link);
+         displayProfile(twitchUserData[i].name,
+            twitchUserData[i].stream,
+            twitchUserData[i].logo,
+            twitchUserData[i].link,
+            twitchUserData[i].nameColor,
+            twitchUserData[i].channelUrl
+         );
       }
    });
+
+   document.getElementById('online').addEventListener("click", function() {
+      //had to use jquery here man
+      //clear items before showing
+      $("#newContent").empty();
+
+      //display online users
+      for (var i = 0; i < onlineStreamers.length; i++) {
+         displayProfile(onlineStreamers[i].name,
+            onlineStreamers[i].stream,
+            onlineStreamers[i].logo,
+            onlineStreamers[i].link,
+            onlineStreamers[i].nameColor,
+            onlineStreamers[i].channelUrl)
+      }
+         // console.log(offlineStreamers);
+   });
+
+   document.getElementById('offline').addEventListener("click", function() {
+      //had to use jquery here man
+      //clear items before showing
+      $("#newContent").empty();
+
+      //display online users
+      for (var i = 0; i < offlineStreamers.length; i++) {
+         displayProfile(offlineStreamers[i].name,
+            offlineStreamers[i].stream,
+            offlineStreamers[i].logo,
+            offlineStreamers[i].link,
+            offlineStreamers[i].nameColor,
+            offlineStreamers[i].channelUrl)
+      }
+         // console.log(offlineStreamers);
+   });
+
+    (function getUserData() {
+        streamers.forEach(function(twitchUser) {
+            getStreamData(twitchUser);
+        })
+    })();
+
+    function getStreamData(user) {
+      var clientId = "?client_id=rwh926q8ctfv1ehglohd745jwasutw";
+      var twitchStream = "https://api.twitch.tv/kraken/streams/"
+      var twitchChannel = "https://api.twitch.tv/kraken/channels/";
+
+        fetch(twitchStream + user + clientId)
+            .then(function(response) {
+
+                return response.json();
+
+            }).then(function(data) {
+               console.log(data);
+                var tempData = {};
+
+                if(data.stream === null) {
+                    tempData.stream = "Offline";
+                    tempData.nameColor = "red";
+                }
+
+                else if (data.stream === undefined) {
+                   tempData.stream = "Account closed";
+                   tempData.nameColor = "red";
+
+                }
+                else {
+
+                    tempData.stream = data.stream.game;
+                    tempData.channelUrl = data.stream.channel.url;
+                    tempData.nameColor = "green";
+                }
+
+            //send out another fetch request to get profile data
+            fetch(twitchChannel + user + clientId)
+               .then(function(response) {
+
+                return response.json();
+
+                }).then(function(profileData) {
+                    //console.log(profileData);
+                    tempData.name = profileData.display_name;
+                    tempData.link = "https://www.twitch.tv/" + profileData.display_name;
+                    tempData.logo = profileData.logo;
+
+                    twitchUserData.push(tempData);
+
+                    //push onlineStreamers users to onlineStreamers array
+                    onlineStreamers = twitchUserData.filter(function(el) {
+                       return (el.stream !== "Offline");
+                    });
+
+                    //push online users to offlineStreamers array
+                    offlineStreamers = twitchUserData.filter(function(el) {
+                       return (el.stream === "Offline");
+                    });
+
+
+                }).catch(function(err) {
+                    //todo show error display in html
+                    console.log("Not able to get ", err);
+            })
+
+            }).catch(function(err) {
+                //todo shoaw error display in html
+                console.log("Not able to fetch stream data", err);
+        })
+    }
+
+    function displayProfile(name, status, logo, link, nameColor, streamLink)
+    {
+      var mainContainer = document.getElementById('mainContainer');
+      var newContent = document.getElementById('newContent');
+
+      var content = document.createElement('div');
+      content.setAttribute("id","content");
+      if(status === "Offline") { content.style.backgroundColor = nameColor; }
+      content.classList.add("input-group", "content", "container");
+
+      var userPicDiv = document.createElement('div');
+      userPicDiv.classList.add('userPic');
+
+      var users = document.createElement('div');
+      users.classList.add("users");
+
+      var image = document.createElement('img');
+      image.classList.add("img-circle", "profilePictue");
+      image.setAttribute("alt","Twitch Logo");
+
+      if(!logo) { image.setAttribute('src', "https://s3-us-west-2.amazonaws.com/web-design-ext-production/p/Twitch_474x356.png"); }
+      else { image.setAttribute('src', logo); }
+
+      var twitchUser = document.createElement('a');
+      twitchUser.setAttribute("href", link);
+      twitchUser.setAttribute("target", "_blank");
+      twitchUser.innerHTML = name;
+
+      var stream = document.createElement('div');
+      stream.classList.add('stream');
+
+      var twitchStream = document.createElement('a');
+      if(streamLink) { twitchStream.setAttribute("href", streamLink); }
+      twitchStream.innerHTML = status;
+      twitchStream.setAttribute("target", "_blank");
+
+      userPicDiv.appendChild(image);
+      content.appendChild(userPicDiv);
+      users.appendChild(twitchUser);
+      content.appendChild(users);
+      mainContainer.appendChild(content);
+      stream.appendChild(twitchStream);
+      content.appendChild(stream);
+      newContent.appendChild(content)
+      mainContainer.appendChild(newContent);
+   }
+
+})();
 
     //This is service worker. A javascript technology to help in network operations including caching. For our application, we don't want to fetch data every time from the API endpoint, as this slows the speed of the app.
     //1. check for service worker availability and register it
@@ -112,182 +200,3 @@ $(document).ready(function(){
    //      content.classList.remove("input-group", "content", "container")
     //
    //  }
-
-    function getUserData() {
-        streamers.forEach(function(twitchUser) {
-            getStreamData(twitchUser);
-        })
-    }
-
-    function getStreamData(user) {
-
-        fetch(twitchStream + user + clientId)
-            .then(function(response) {
-
-                return response.json();
-
-            }).then(function(data) {
-               //  console.log(data);
-                var tempData = {};
-
-                if(!data.stream) {
-                    tempData.stream = "Offline";
-                }
-                else {
-                    tempData.stream = data.stream.game;
-                }
-
-                tempData.link = data._links.self;
-                //twitchUserData.push(tempData);
-
-            //send out another fetch request to get profile data
-            fetch(twitchChannel + user + clientId)
-               .then(function(response) {
-
-                return response.json();
-
-                }).then(function(profileData) {
-                    //console.log(profileData);
-                    tempData.name = profileData.display_name;
-                    tempData.logo = profileData.logo;
-                    twitchUserData.push(tempData);
-                }).catch(function(err) {
-                    //todo show error display in html
-                    console.log("Not able to get ", err);
-            })
-
-            }).catch(function(err) {
-                //todo shoaw error display in html
-                console.log("Not able to fetch stream data", err);
-        })
-    }
-
-
-
-
-
-
-
-
-
-    //fetch all users using twitch api
-
-
-
-    //fetch the user using HTML5 web api instead of Jquery
-    //it's faster because we are not including the whole of jquery and calling just a small portion of it
-//
-//    for(var i = 0; i < streamers.length; i++)
-//    {
-//        fetch(twitchUrl + streamers[i] + id).then(function(response)
-//        {
-//            //handle the response as json with a built json method
-//            return response.json();
-//
-//        }).then(function(data)
-//        {
-//
-//            console.log(data);
-//
-//            var mainContainer = document.getElementById('mainContainer');
-//            var content = document.createElement('div');
-//            content.classList.add("input-group", "content", "container");
-//            content.setAttribute("id","content")
-//
-//            var userPicDiv = document.createElement('div');
-//            userPicDiv.classList.add('userPic');
-//
-//            var users = document.createElement('div');
-//            users.classList.add("users");
-//
-//            var image = document.createElement('img');
-//            image.classList.add("img-circle", "profilePictue");
-//            image.setAttribute("alt","Twitch Logo");
-//
-//            if(!data.logo)
-//            {
-//              image.setAttribute('src', "https://s3-us-west-2.amazonaws.com/web-design-ext-production/p/Twitch_474x356.png");
-//            }
-//
-//            else
-//            {
-//               image.setAttribute('src', data.logo);
-//            }
-//
-//            var twitchUser = document.createElement('a');
-//            twitchUser.setAttribute("href", data._links.self);
-//            twitchUser.innerHTML = data.display_name;
-//
-//
-//
-//            userPicDiv.appendChild(image);
-//            content.appendChild(userPicDiv);
-//
-//            users.appendChild(twitchUser);
-//            content.appendChild(users);
-//
-//            mainContainer.appendChild(content);
-//
-//
-////
-////          we have gotten the user object
-//////        lets extract the id and fetch the stream status
-//            let twitchStream =  "https://api.twitch.tv/kraken/streams/" + data._id + "?client_id=rwh926q8ctfv1ehglohd745jwasutw";
-//
-//            //make the fetch
-//            fetch(twitchStream).then(function(response)
-//            {
-//                return response.json();
-//
-//            }).then(function(finalData)
-//            {
-//
-//                console.log(finalData);
-//
-//                var twitchStatus;
-//                var backColor;
-//                var twitchStream;
-//
-//                var stream = document.createElement('div');
-//                stream.classList.add('stream');
-//
-//                twitchStream = document.createElement('a');
-//                twitchStream.setAttribute("href", "#");
-//
-//
-//
-//                if(!finalData.stream)
-//                {
-//                    twitchStream.innerHTML = "Offline";
-//                    document.getElementById('content').style.backgroundColor = "red";
-//
-//                    //offline.push(streamers[]);
-//
-//                    //console.log(offline);
-//
-//                }
-//
-//                else
-//                {
-//                    twitchStream.innerHTML = "Online";
-//                    document.getElementById('content').style.backgroundColor = "aqua";
-//                }
-//
-//
-//                stream.appendChild(twitchStream);
-//                content.appendChild(stream);
-//
-//                mainContainer.appendChild(content);
-//
-//
-//
-////                console.log(content);
-//
-//            });
-//
-//        }).catch(function(err)
-//        {
-//           console.log("Error, request not completed");
-//        });
-//    }
-});
