@@ -6,6 +6,11 @@ body
     font-family: "Raleway", "New Times Roman";
 }
 
+#newContent {
+   /*padding-right: 50px;*/
+   width: 300px;
+   padding: 0;
+}
 
 .imageHead
 {
@@ -21,7 +26,7 @@ body
 {
     width: 300px;
     padding: 0;
-    background-color: black;  
+    background-color: black;
 }
 
 .twitchLogo
@@ -32,7 +37,7 @@ body
 
 .btn
 {
-    background-color: #6441a5; 
+    background-color: #6441a5;
     border-radius: 0 !important;
     color: white;
     text-decoration: none;
@@ -51,12 +56,12 @@ body
 .btn:hover
 {
     background-color: #b9a3e3;
-    color: black;  
+    color: black;
 }
 
-.btn-group .button 
+.btn-group .button
 {
-    background-color: #6441a5; 
+    background-color: #6441a5;
     border: 1px solid  black;
     color: white;
     padding: 15px 31px;
@@ -81,7 +86,7 @@ body
     color: black;
 }
 
-.button:active, .btn:active 
+.button:active, .btn:active
 {
   box-shadow: 0 5px #666;
   transform: translateY(2px);
@@ -129,8 +134,3 @@ body
     background-color: black;
     padding: 0;
 }
-
-
-
-
-
