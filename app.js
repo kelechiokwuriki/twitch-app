@@ -1,14 +1,20 @@
 (function(){
-
    const streamers = ["ESL_SC2", "cretetion", "freecodecamp", "OgamingSC2"];
    var onlineStreamers = [];
    var offlineStreamers = [];
 
-   var twitchUserData = [];
-   var onlineUserData;
+   //disable all buttons and set backgroundColor to grey on start up till data fetch has been completed
+   var navButtons = document.querySelectorAll("#all, #online, #offline");
+   navButtons.forEach(function(but) {
+      but.style.backgroundColor = "grey";
+      but.disabled = true;
+   })
 
-    document.getElementById('all').addEventListener("click", function() {
+   var twitchUserData = [];
+
+   document.getElementById('all').addEventListener("click", function() {
       // console.log(twitchUserData);
+
       //had to use jquery here man
       //clear items before showing
       $("#newContent").empty();
@@ -109,6 +115,16 @@
 
                     twitchUserData.push(tempData);
 
+                    //enable and set buttons to initial property
+                    //since we now have data to work width
+                    navButtons.forEach(function(but) {
+                       but.style.backgroundColor = "#6441a5";
+                       but.disabled = false;
+                    })
+
+                    //remove loading text.. had to use jquery here
+                    $('#loading').empty();
+
                     //push onlineStreamers users to onlineStreamers array
                     onlineStreamers = twitchUserData.filter(function(el) {
                        return (el.stream !== "Offline");
@@ -180,16 +196,16 @@
    //This is service worker. A javascript technology to help in network operations including caching.
    // For our application, we don't want to fetch data every time from the API endpoint, as this slows the speed of the app.
    // 1. check for service worker availability and register it
-  if('serviceWorker' in navigator){
-
-      navigator.serviceWorker
-      .register('sw.js')
-      .then(function(registeration) {
-          console.log("Service worker registered", registeration);
-      })
-      .catch(function(err) {
-          console.log("Service worker failed to register", err);
-      })
-  }
+  // if('serviceWorker' in navigator){
+  //
+  //     navigator.serviceWorker
+  //     .register('sw.js')
+  //     .then(function(registeration) {
+  //         console.log("Service worker registered", registeration);
+  //     })
+  //     .catch(function(err) {
+  //         console.log("Service worker failed to register", err);
+  //     })
+  // }
 
 })();
