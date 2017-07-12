@@ -2,6 +2,11 @@
    const streamers = ["ESL_SC2", "cretetion", "freecodecamp", "OgamingSC2"];
    var onlineStreamers = [];
    var offlineStreamers = [];
+   var searchResultStreamer = [];
+
+   var clientId = "?client_id=rwh926q8ctfv1ehglohd745jwasutw";
+   var twitchStream = "https://api.twitch.tv/kraken/streams/"
+   var twitchChannel = "https://api.twitch.tv/kraken/channels/";
 
    //disable all buttons and set backgroundColor to grey on start up till data fetch has been completed
    var navButtons = document.querySelectorAll("#all, #online, #offline");
@@ -11,6 +16,80 @@
    })
 
    var twitchUserData = [];
+
+   document.getElementById('searchButton').addEventListener("click", function() {
+      //had to use jquery here man
+      //clear items before showing
+      $("#newContent").empty();
+      //i broke the rule of Don't Repeat Yourself (DRY).
+      //i can't think of a better idea at this time
+      //help :(
+      var searchData = document.getElementById('searchVal').value;
+      fetch(twitchStream + searchData + clientId)
+          .then(function(response) {
+
+              return response.json();
+
+          }).then(function(data) {
+             console.log(data);
+              var searchObject = {};
+
+              if(data.stream === null) {
+                  searchObject.stream = "Offline";
+                  searchObject.nameColor = "red";
+              }
+
+              else if (data.stream === undefined) {
+                 searchObject.stream = "Account closed";
+                 searchObject.nameColor = "red";
+
+              }
+              else {
+
+                  searchObject.stream = data.stream.game;
+                  searchObject.channelUrl = data.stream.channel.url;
+                  searchObject.nameColor = "green";
+              }
+
+          //send out another fetch request to get profile data
+          fetch(twitchChannel + searchData + clientId)
+             .then(function(response) {
+
+              return response.json();
+
+              }).then(function(profileData) {
+                  //console.log(profileData);
+                  searchObject.name = profileData.display_name;
+                  searchObject.link = "https://www.twitch.tv/" + profileData.display_name;
+                  searchObject.logo = profileData.logo;
+
+                  searchResultStreamer.push(searchObject);
+
+                  for (var i = 0; i < searchResultStreamer.length; i++) {
+                     displayProfile(searchResultStreamer[i].name,
+                        searchResultStreamer[i].stream,
+                        searchResultStreamer[i].logo,
+                        searchResultStreamer[i].link,
+                        searchResultStreamer[i].nameColor,
+                        searchResultStreamer[i].channelUrl
+                     );
+                  }
+                  //we don't want the search result to remain in the
+                  //array so we empty it
+                  searchResultStreamer.splice(0,searchResultStreamer.length);
+                  //remove loading text.. had to use jquery here
+                  $('#loading').empty();
+
+              }).catch(function(err) {
+                  //todo show error display in html
+                  console.log("Not able to get ", err);
+          })
+
+          }).catch(function(err) {
+              //todo shoaw error display in html
+              console.log("Not able to fetch stream data", err);
+      })
+   });
 
    document.getElementById('all').addEventListener("click", function() {
       // console.log(twitchUserData);
@@ -71,9 +150,6 @@
     })();
 
     function getStreamData(user) {
-      var clientId = "?client_id=rwh926q8ctfv1ehglohd745jwasutw";
-      var twitchStream = "https://api.twitch.tv/kraken/streams/"
-      var twitchChannel = "https://api.twitch.tv/kraken/channels/";
 
         fetch(twitchStream + user + clientId)
             .then(function(response) {
