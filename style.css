@@ -12,6 +12,11 @@ body
    padding: 0;
 }
 
+#loading {
+   color: black;
+   font-size: 30px;
+}
+
 .imageHead
 {
     width: 300px;
