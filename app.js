@@ -25,6 +25,11 @@
       //i can't think of a better idea at this time
       //help :(
       var searchData = document.getElementById('searchVal').value;
+
+      if(searchData === "") {
+         return;
+      }
+
       fetch(twitchStream + searchData + clientId)
           .then(function(response) {
 
@@ -54,6 +59,7 @@
           //send out another fetch request to get profile data
           fetch(twitchChannel + searchData + clientId)
              .then(function(response) {
+                document.getElementById('searchVal').value = '';
 
               return response.json();
 
@@ -77,8 +83,6 @@
                   //we don't want the search result to remain in the
                   //array so we empty it
                   searchResultStreamer.splice(0,searchResultStreamer.length);
-                  //remove loading text.. had to use jquery here
-                  $('#loading').empty();
 
               }).catch(function(err) {
                   //todo show error display in html
